@@ -23,6 +23,9 @@ def convert_bag_to_png(bagFile, dirPath, saveDir):
     # save_path = os.path.join(dir_path, '../bag_png',pre_bag)
     save_path = os.path.join(saveDir, pre_bag)
     screenshot_path = os.path.join(saveDir,'firstframe')
+    if not os.path.exists(screenshot_path):
+        os.makedirs(screenshot_path)
+
     print("save path:", save_path)
     if not os.path.isdir(screenshot_path):
         os.mkdir(screenshot_path)
