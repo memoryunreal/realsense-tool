@@ -3,7 +3,6 @@ import numpy as np
 import cv2
 import argparse
 import os.path
-import tkinter.filedialog
 import os
 
 def read_bag_filename(inputDir):
