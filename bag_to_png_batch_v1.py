@@ -4,6 +4,13 @@ import cv2
 import argparse
 import os.path
 import os
+from multiprocessing import Pool
+
+def worker(bag_file):
+    convert_bag_to_png(bag_file, input_dir, output_dir)
+    print('{} Finished ************', bag_file)
+
+
 
 def read_bag_filename(inputDir):
     dir_path = inputDir
@@ -79,7 +86,7 @@ def convert_bag_to_png(bagFile, dirPath, saveDir):
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
             color_image_rgb = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
 
-            cv2.imwrite('%s/%s/%08d.png' % (save_path, 'color', index+1), color_image_rgb)
+            cv2.imwrite('%s/%s/%08d.jpg' % (save_path, 'color', index+1), color_image_rgb)
             cv2.imwrite('%s/%s/%08d.png' % (save_path, 'colormap', index+1), depth_colormap)
             cv2.imwrite('%s/%s/%08d.png' % (save_path, 'depth', index+1), depth_image)
             if index == 0:
@@ -102,6 +109,18 @@ if __name__ == '__main__':
     output_dir = args.output_dir
     print(input_dir)
     bag_file_list = read_bag_filename(input_dir)
-    for bag_file in bag_file_list:
-        convert_bag_to_png(bag_file, input_dir, output_dir)
-    print('************ Finished ************')
+    # for bag_file in bag_file_list:
+        # convert_bag_to_png(bag_file, input_dir, output_dir)
+    
+    # 创建一个进程池，使用CPU的所有核
+    # pool = Pool(os.cpu_count())
+    pool = Pool(8)
+
+    # 使用map函数，让进程池中的每个进程都运行worker函数，对bag_file_list中的每个元素进行操作
+    pool.map(worker, bag_file_list)
+
+    # 关闭进程池，不再接受新的任务
+    pool.close()
+    
+    # 等待所有子进程完成任务
+    pool.join()
